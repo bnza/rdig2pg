@@ -1,0 +1,19 @@
+version: '3'
+services:
+#  mysql:
+#    context: docker/mysql
+#      args:
+#        DBNAME: "$DBNAME"
+#        RDIG_USER: "$MYSQL_USER"
+  php:
+    build:
+      context: docker/php
+      args:
+        UID: ${UID}
+        GID: ${GID}
+    volumes:
+      - ./project:/opt/project
+    tty: true
+    environment:
+      COMPOSER_MEMORY_LIMIT: ${PHPFPM_COMPOSER_MEMORY_LIMIT}
+      XDEBUG_CONFIG: remote_host=${XDEBUG_CONFIG_REMOTE_HOST}
