@@ -23,4 +23,8 @@ WORKDIR /opt/project
 
 USER rdig
 
-CMD bin/wait-for-rdig.sh && composer install && bin/console doctrine:migrations:migrate latest --no-interaction && php
+CMD bin/wait-for-rdig-db.sh \
+    && composer install \
+    && bin/console doctrine:migrations:migrate latest --no-interaction \
+    && bin/setup-postgres-db.sh \
+    && php

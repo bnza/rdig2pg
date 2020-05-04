@@ -8,15 +8,12 @@ doctrine:
                 driver: 'pdo_mysql'
                 server_version: '5.7'
                 charset: utf8mb4
-#            postgres:
-#                url: '%env(resolve:POSTGRES_DATABASE_URL)%'
-#                driver: 'pdo_pgsql'
-#                server_version: '12'
-#                charset: utf8
+            postgres:
+                url: '%env(resolve:POSTGRES_DATABASE_URL)%'
+                driver: 'pdo_pgsql'
+                server_version: '12'
+                charset: utf8
 
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '5.7'
     orm:
         auto_generate_proxy_classes: true
         default_entity_manager: mysql
@@ -24,7 +21,16 @@ doctrine:
             mysql:
                 naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
                 connection: mysql
-                auto_mapping: true
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: xml
+                        dir: '%kernel.project_dir%/config/mapping/orm'
+                        prefix: 'App\Entity'
+                        alias: App
+            postgres:
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                connection: postgres
                 mappings:
                     App:
                         is_bundle: false
