@@ -1,6 +1,6 @@
 /.idea
 /.env
-/dumps/
+/dumps/*
 ###> symfony/framework-bundle ###
 /project/.env.local
 /project/.env.local.php

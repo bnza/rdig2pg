@@ -22,3 +22,5 @@ RUN curl -Ss https://getcomposer.org/installer | php -- --install-dir /usr/local
 WORKDIR /opt/project
 
 USER rdig
+
+CMD bin/wait-for-rdig.sh && composer install && bin/console doctrine:migrations:migrate latest --no-interaction && php

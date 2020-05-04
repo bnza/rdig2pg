@@ -1,10 +1,26 @@
 version: '3'
 services:
-#  mysql:
-#    context: docker/mysql
-#      args:
-#        DBNAME: "$DBNAME"
-#        RDIG_USER: "$MYSQL_USER"
+  mysql:
+    build:
+      context: .
+      dockerfile: docker/mysql/Dockerfile
+      args:
+        DBNAME: "$DBNAME"
+        RDIG_USER: "$MYSQL_USER"
+        DUMP_IN: "$DUMP_IN"
+    environment:
+      MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
+      MYSQL_PASSWORD: "$MYSQL_PASSWORD"
+      MYSQL_USER: "$MYSQL_USER"
+    ports:
+      - "3310:3306"
+    volumes:
+      - /var/local/docker/volumes/rdig2pg-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u $MYSQL_USER -p $MYSQL_PASSWORD $DBNAME -e 'SELECT COUNT(*) FROM finding;'"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
   php:
     build:
       context: docker/php
@@ -17,3 +33,5 @@ services:
     environment:
       COMPOSER_MEMORY_LIMIT: ${PHPFPM_COMPOSER_MEMORY_LIMIT}
       XDEBUG_CONFIG: remote_host=${XDEBUG_CONFIG_REMOTE_HOST}
+    depends_on:
+      - mysql
