@@ -17,6 +17,7 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "^5.0"
     },
     "config": {
         "preferred-install": {
@@ -31,7 +32,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "App\\Tests\\": "tests/src"
         }
     },
     "replace": {
