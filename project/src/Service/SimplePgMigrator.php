@@ -36,6 +36,7 @@ use App\Entity\VocPTechniqueEntity;
 use App\Entity\VocSTypeEntity;
 use App\Service\Migrator\MigratorInterface;
 use Doctrine\ORM\EntityManager;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SimplePgMigrator
 {
@@ -76,24 +77,48 @@ class SimplePgMigrator
 
     private EntityManager $myEm;
     private EntityManager $pgEm;
+    private EventDispatcherInterface $dispatcher;
+    private array $classes = [];
+    private array $info = [];
 
-    public function __construct(EntityManager $myEm, EntityManager $pgEm)
+    public function __construct(EventDispatcherInterface $dispatcher, EntityManager $myEm, EntityManager $pgEm)
     {
         $this->myEm = $myEm;
         $this->pgEm = $pgEm;
+        $this->dispatcher = $dispatcher;
     }
 
     public function migrate()
     {
         foreach (self::CLASSES as $class) {
-            $path = explode('\\', $class);
+            $this->getMigrator($class)->migrate();
+        }
+    }
+
+    public function info(): array
+    {
+        if (!$this->info) {
+            $info = [];
+            foreach (self::CLASSES as $class) {
+                $migrator = $this->getMigrator($class);
+                $info[$class]['table'] = $migrator->getTable();
+                $info[$class]['rowsCount'] = $migrator->getRowsCount();
+            }
+            $this->info = $info;
+        }
+
+        return $this->info;
+    }
+
+    private function getMigrator(string $entityClass): MigratorInterface
+    {
+        if (!array_key_exists($entityClass, $this->classes)) {
+            $path = explode('\\', $entityClass);
             $class = array_pop($path);
             $migratorClass = "App\\Service\\Migrator\\${class}Migrator";
-            /**
-             * @var MigratorInterface $migrate
-             */
-            $migrator = new $migratorClass($this->myEm->getConnection(), $this->pgEm->getConnection());
-            $migrator->migrate();
+            $this->classes[$entityClass] = new $migratorClass($this->dispatcher, $this->myEm->getConnection(), $this->pgEm->getConnection());
         }
+
+        return $this->classes[$entityClass];
     }
 }

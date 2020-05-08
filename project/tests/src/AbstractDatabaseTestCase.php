@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,11 +17,11 @@ abstract class AbstractDatabaseTestCase extends KernelTestCase
         if (!isset(self::$kernel)) {
             self::bootKernel(self::$kernelBootOptions);
         }
-        return self::$kernel;
 
+        return self::$kernel;
     }
 
-    protected function getEntityManager(string $em='mysql'): EntityManagerInterface
+    protected function getEntityManager(string $em = 'mysql'): EntityManagerInterface
     {
         if (!array_key_exists($em, self::$ems)) {
             self::$ems[$em] = self::getTestKernel()
@@ -30,6 +29,7 @@ abstract class AbstractDatabaseTestCase extends KernelTestCase
                 ->get('doctrine')
                 ->getManager($em);
         }
+
         return self::$ems[$em];
     }
 
@@ -73,6 +73,4 @@ abstract class AbstractDatabaseTestCase extends KernelTestCase
             ->getArrayResult();
         $this->assertEquals($actual, $expected, "Migrates table for $entityClass class does not match");
     }
-
-
 }

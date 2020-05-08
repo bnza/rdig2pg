@@ -10,6 +10,10 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $myEm: '@doctrine.orm.mysql_entity_manager'
+            $pgEm: '@doctrine.orm.postgres_entity_manager'
+
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -25,11 +29,3 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-
-    App\Service\SimplePgMigrator:
-        arguments:
-            $myEm: '@doctrine.orm.mysql_entity_manager'
-            $pgEm: '@doctrine.orm.postgres_entity_manager'
-
-    App\Faker\Provider\JobProvider:
-        tags: [ { name: nelmio_alice.faker.provider } ]

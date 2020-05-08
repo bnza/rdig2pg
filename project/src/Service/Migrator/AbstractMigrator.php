@@ -5,14 +5,18 @@ namespace App\Service\Migrator;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
 abstract class AbstractMigrator implements MigratorInterface
 {
     private Connection $myConn;
     private Connection $pgConn;
+    private EventDispatcherInterface $dispatcher;
     private int $rowsCount;
     private Statement $insertStmt;
     private string $table;
+    private string $entityClass;
 
     protected function generateTableName(): string
     {
@@ -22,7 +26,7 @@ abstract class AbstractMigrator implements MigratorInterface
         return Inflector::tableize($class);
     }
 
-    protected function getTable(): string
+    public function getTable(): string
     {
         if (!isset($this->table)) {
             $this->table = $this->generateTableName();
@@ -33,10 +37,13 @@ abstract class AbstractMigrator implements MigratorInterface
 
     abstract public function getInsertQuerySQL(): string;
 
-    public function __construct(Connection $myConn, Connection $pgConn)
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $myConn, Connection $pgConn)
     {
+        $this->dispatcher = $dispatcher;
         $this->myConn = $myConn;
         $this->pgConn = $pgConn;
+        $path = explode('\\', static::class);
+        $this->entityClass = 'App\\Entity\\'.$class = substr(array_pop($path), 0, -8);
     }
 
     public function getData(): iterable
@@ -47,7 +54,7 @@ abstract class AbstractMigrator implements MigratorInterface
             ->getIterator();
     }
 
-    public function countRows(): int
+    public function getRowsCount(): int
     {
         if (!isset($this->rowsCount)) {
             $this->rowsCount = $this->executeCountRows();
@@ -63,7 +70,9 @@ abstract class AbstractMigrator implements MigratorInterface
             $insertStmt = $this->getInsertStmt();
             $data = $this->getData();
             $data->execute();
-            foreach ($data as $datum) {
+            $this->dispatchStart();
+            foreach ($data as $i => $datum) {
+                $this->dispatchStep($i);
                 $insertStmt->execute($datum);
             }
         } catch (\Exception $e) {
@@ -71,6 +80,47 @@ abstract class AbstractMigrator implements MigratorInterface
             throw $e;
         }
         $this->pgConn->commit();
+        $this->dispatchFinish();
+    }
+
+    private function dispatchStart()
+    {
+        $this->dispatcher->dispatch(
+            new GenericEvent(
+                MigratorInterface::EVENT_START,
+                [
+                    'class' => $this->entityClass,
+                ]
+            ),
+            MigratorInterface::EVENT_START
+        );
+    }
+
+    private function dispatchStep(int $stepNum)
+    {
+        $this->dispatcher->dispatch(
+            new GenericEvent(
+                MigratorInterface::EVENT_STEP,
+                [
+                    'stepNum' => $stepNum,
+                    'class' => $this->entityClass,
+                ]
+            ),
+            MigratorInterface::EVENT_STEP
+        );
+    }
+
+    private function dispatchFinish()
+    {
+        $this->dispatcher->dispatch(
+            new GenericEvent(
+                MigratorInterface::EVENT_FINISH,
+                [
+                    'class' => $this->entityClass,
+                ]
+            ),
+            MigratorInterface::EVENT_FINISH
+        );
     }
 
     private function executeCountRows(): int

@@ -25,5 +25,4 @@ class SimplePgMigratorTest extends AbstractDatabaseTestCase
             $this->assertMigratedTablesEquals($class);
         }
     }
-
 }
