@@ -102,6 +102,11 @@ class SiteEntity implements SiteRelateEntityInterface
 //        $this->users->removeElement($user);
 //    }
 
+    public function setId(int $id)
+    {
+        $this->id = $id;
+    }
+
     public function getId(): int
     {
         return $this->id;

@@ -25,3 +25,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Service\SimplePgMigrator:
+        arguments:
+            $myEm: '@doctrine.orm.mysql_entity_manager'
+            $pgEm: '@doctrine.orm.postgres_entity_manager'
+
+    App\Faker\Provider\JobProvider:
+        tags: [ { name: nelmio_alice.faker.provider } ]

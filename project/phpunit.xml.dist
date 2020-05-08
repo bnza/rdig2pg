@@ -13,8 +13,6 @@
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="8.5" />
-<!--        <env name="MYSQL_DATABASE_URL" value="mysql://rdigtestuser:passwd@mysql-test:3306/test_rdig" />
-        <env name="POSTGRES_DATABASE_URL" value="postgresql://rdigtestuser:passwd@postgres-test:5432/test_rdig" />-->
     </php>
 
     <testsuites>
@@ -28,6 +26,10 @@
             <directory suffix=".php">src</directory>
         </whitelist>
     </filter>
+
+    <extensions>
+        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
+    </extensions>
 
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />

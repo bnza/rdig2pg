@@ -2,16 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-
-/**
- * @ApiResource(
- *     shortName="finding",
- *     description="Generic archaeological finding",
- *     collectionOperations={"get"},
- *     itemOperations={"get"}
- * )
- */
 class FindingEntity implements SiteRelateEntityInterface
 {
     /**
@@ -86,6 +76,11 @@ class FindingEntity implements SiteRelateEntityInterface
             $num = sprintf("%'.04s", $num);
         }
         $this->num = $num;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getId(): int

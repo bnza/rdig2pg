@@ -213,13 +213,23 @@ class ContextEntity implements SiteRelateEntityInterface
     }
 
 
-//    /**
-//     * @return PhaseEntity
-//     */
-//    public function getPhase(): PhaseEntity
-//    {
-//        return $this->phase;
-//    }
+    /**
+     * @return PhaseEntity
+     */
+    public function getPhase(): PhaseEntity
+    {
+        return $this->phase;
+    }
+
+    /**
+     * @param PhaseEntity $phase
+     * @throws \Exception
+     */
+    public function setPhase(?PhaseEntity $phase): void
+    {
+        $this->phase = $phase;
+    }
+
 //
 //    /**
 //     * @param PhaseEntity $phase
