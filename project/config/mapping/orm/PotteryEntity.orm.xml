@@ -33,7 +33,7 @@
             <join-column name="inclusions_size" referenced-column-name="id" on-delete="RESTRICT" />
         </many-to-one>
         <many-to-one field="inclusionsType" target-entity="VocPInclusionsTypeEntity" >
-            <join-column name="inclusions_type_id" referenced-column-name="id" on-delete="RESTRICT" />
+            <join-column name="inclusions_type" referenced-column-name="id" on-delete="RESTRICT" />
         </many-to-one>
         <many-to-one field="innerColor" target-entity="VocFColorEntity" >
             <join-column name="inner_color" referenced-column-name="id" on-delete="RESTRICT" />
